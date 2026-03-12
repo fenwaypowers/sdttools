@@ -1,10 +1,9 @@
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO, Optional
 import struct
-from os import PathLike
 
 from .utils import chunks
+from .types import PathType
 
-PathType = Union[str, PathLike[str]]
 
 def write_record(
     f: BinaryIO,

@@ -1,13 +1,11 @@
-from typing import Optional, Iterable, Dict, Union
-from os import PathLike
+from typing import Optional, Iterable, Dict
 import os
 import tempfile
 import shutil
 
 from .demux import demux_sdt
 from .mux import mux
-
-PathType = Union[str, PathLike[str]]
+from .types import PathType
 
 
 class SDT:

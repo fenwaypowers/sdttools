@@ -1,10 +1,8 @@
 import os
-from typing import Dict, BinaryIO, Union
-from os import PathLike
+from typing import Dict, BinaryIO
 
 from .utils import get_u32_le
-
-PathType = Union[str, PathLike[str]]
+from .types import PathType
 
 STREAM_ID_ADPCM: int = 1
 
