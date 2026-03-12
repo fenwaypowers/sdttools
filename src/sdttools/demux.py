@@ -1,9 +1,14 @@
 import os
+from typing import Dict, BinaryIO, Union
+from os import PathLike
+
 from .utils import get_u32_le
 
-STREAM_ID_ADPCM = 1
+PathType = Union[str, PathLike[str]]
 
-extmap = {
+STREAM_ID_ADPCM: int = 1
+
+extmap: Dict[int, str] = {
     0x00000001: ".genh",   # ADPCM -> GENH / ".sdx_0"
     0x00000002: ".dmx",    # this container was found on Zone of the Enders HD Remaster
 	0x00000003: ".nrm",
@@ -32,38 +37,47 @@ extmap = {
 }
 
 
-def demux_sdt(sdt_path, out_dir):
+def demux_sdt(sdt_path: PathType, out_dir: PathType) -> None:
+    """
+    Demux the contents of the specified SDT file into the given output directory.
+    Args:
+        sdt_path (PathType): The path to the SDT file to demux.
+        out_dir (PathType): The directory to output the demuxed files to.
+    """
+    sdt_path = os.fspath(sdt_path)
+    out_dir = os.fspath(out_dir)
 
-    streams = {}
+    streams: Dict[int, BinaryIO] = {}
 
     with open(sdt_path, "rb") as sdt:
 
-        sdt_size = os.path.getsize(sdt_path)
+        sdt_size: int = os.path.getsize(sdt_path)
 
         while sdt.tell() < sdt_size:
 
-            header = sdt.read(16)
-            rid = get_u32_le(header, 0)
+            header: bytes = sdt.read(16)
+            rid: int = get_u32_le(header, 0)
 
             if rid == 0xF0:
                 break
 
             elif rid == 0x10:
 
-                sid = get_u32_le(header, 0x0C)
+                sid: int = get_u32_le(header, 0x0C)
 
                 if sid in extmap:
-                    path = os.path.join(
+                    path: str = os.path.join(
                         out_dir,
                         os.path.splitext(os.path.basename(sdt_path))[0] + extmap[sid]
                     )
                 else:
                     path = os.path.join(
                         out_dir,
-                        "%s_%08X.bin" % (
+                        "%s_%08X.bin"
+                        % (
                             os.path.splitext(os.path.basename(sdt_path))[0],
-                            sid
-                        )
+                            sid,
+                        ),
                     )
 
                 streams[sid] = open(path, "w+b")
@@ -73,7 +87,7 @@ def demux_sdt(sdt_path, out_dir):
 
             elif rid in streams:
 
-                size = get_u32_le(header, 4) - 16
+                size: int = get_u32_le(header, 4) - 16
                 streams[rid].write(sdt.read(size))
 
             else:
