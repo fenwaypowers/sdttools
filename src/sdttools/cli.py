@@ -7,6 +7,9 @@ from .sdt import SDT, create_sdt
 
 
 def main() -> None:
+    """
+    Command-line interface for sdttools. Parses arguments and performs extraction or repacking based on the provided inputs.
+    """
 
     parser = argparse.ArgumentParser(
         prog="sdttools",
@@ -68,7 +71,7 @@ def main() -> None:
         else:
             sdt.extract(outputs)
 
-    else:  # Muxing/packing
+    else: # Muxing/packing
 
         video: Optional[str] = None
         audio: Optional[str] = None
