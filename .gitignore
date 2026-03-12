@@ -185,7 +185,6 @@ cython_debug/
 
 # File formats in SDT Files
 #  These are files that can be extracted from an SDT file.
-
 *.genh 
 *.dmx
 *.nrm
