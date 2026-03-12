@@ -1,11 +1,12 @@
 import argparse
 import os
 import sys
+from typing import List, Optional
 
 from .sdt import SDT, create_sdt
 
 
-def main():
+def main() -> None:
 
     parser = argparse.ArgumentParser(
         prog="sdttools",
@@ -38,25 +39,25 @@ def main():
         )
     )
 
-    args = parser.parse_args()
+    args: argparse.Namespace = parser.parse_args()
 
-    inputs = args.inputs
-    outputs = args.output or []
+    inputs: List[str] = args.inputs
+    outputs: List[str] = args.output or []
 
     # Determine demux/mux mode based on input files
-    sdt_inputs = [i for i in inputs if i.lower().endswith(".sdt")]
+    sdt_inputs: List[str] = [i for i in inputs if i.lower().endswith(".sdt")]
 
     if sdt_inputs:
-        mode = "extract"
+        mode: str = "extract"
     else:
         mode = "pack"
 
-    if mode == "extract":
+    if mode == "extract": # Demuxing/extracting
 
         if len(sdt_inputs) > 1:
             sys.exit("Error: Only one SDT file can be extracted at a time.")
 
-        sdt_path = sdt_inputs[0]
+        sdt_path: str = sdt_inputs[0]
         sdt = SDT(sdt_path)
 
         if not outputs:
@@ -67,11 +68,11 @@ def main():
         else:
             sdt.extract(outputs)
 
-    else: # muxing/packing
+    else:  # Muxing/packing
 
-        video = None
-        audio = None
-        subs = None
+        video: Optional[str] = None
+        audio: Optional[str] = None
+        subs: Optional[str] = None
 
         for i in inputs:
 
@@ -83,7 +84,7 @@ def main():
                     print(f"Warning: Multiple video files detected. Using '{video}', ignoring '{i}'.")
                 else:
                     video = i
-                
+
                 if ext == ".mp4":
                     print(
                         "WARNING: MP4 files are likely only supported in the Master Collection version of Metal Gear Solid 2 and 3.\n"
@@ -108,7 +109,7 @@ def main():
                 sys.exit(f"Unsupported input file: {i}")
 
         if not outputs:
-            out_sdt = "output.sdt"
+            out_sdt: str = "output.sdt"
         else:
 
             if len(outputs) > 1:
