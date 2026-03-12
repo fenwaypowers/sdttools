@@ -179,3 +179,36 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# VS Code
+*.vscode/*
+
+# File formats in SDT Files
+#  These are files that can be extracted from an SDT file.
+
+*.genh 
+*.dmx
+*.nrm
+*.pacb
+*.bpx
+*.pac
+*.pss
+*.ipu
+*.m2v
+*.mp4
+*.sdx_1
+*.sub_en
+*.sdx_2
+*.sub_fr
+*.msf
+*.sub_de
+*.xwma
+*.sub_it
+*.9tav
+*.sub_es
+*.sub_jp
+*.vag
+*.mtaf
+
+# SDT files
+*.sdt
