@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdttools"
+version = "0.1.0"
+description = "SDT extract/repack (demux/mux) tool for Metal Gear Solid game files"
+requires-python = ">=3.8"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Fenway Powers"}
+]
+
+[project.scripts]
+sdttools = "sdttools.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
