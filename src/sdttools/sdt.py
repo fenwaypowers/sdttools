@@ -16,12 +16,15 @@ class SDT:
     def __init__(self, path: PathType) -> None:
         """
         Initialize the SDT object with the given file path.
+
         Args:
-            path (PathType): The path to the SDT file.
+            path (PathType): Path to the SDT file.
+
         Raises:
             FileNotFoundError: If the specified SDT file does not exist.
         """
 
+        # Normalize to string in case a pathlib.Path was provided
         self.path: str = os.fspath(path)
 
         if not os.path.exists(self.path):
@@ -30,9 +33,12 @@ class SDT:
 
     def extract_all(self, out_dir: Optional[PathType] = None) -> None:
         """
-        Extract all contents of the SDT file to the specified output directory.
+        Extract all streams from the SDT file.
+
         Args:
-            out_dir (Optional[PathType], optional): The directory to extract to. Defaults to None, which extracts to the same directory as the SDT file.
+            out_dir (Optional[PathType]): Directory where extracted files will
+                be written. If None, files are extracted to the same directory
+                as the SDT file.
         """
 
         if out_dir is None:
@@ -43,14 +49,26 @@ class SDT:
 
     def extract(self, outputs: Iterable[PathType]) -> Dict[str, bool]:
         """
-        Extract specified contents of the SDT file to the given output paths.
+        Extract specific streams from the SDT file.
+
+        The SDT file is first fully demuxed into a temporary directory,
+        after which the requested files are copied to the specified
+        output paths.
+
         Args:
-            outputs (Iterable[PathType]): The paths to extract to.
+            outputs (Iterable[PathType]): Output file paths. The file
+                extension determines which stream type will be extracted
+                (e.g., .m2v, .mtaf, .pacb).
+
         Returns:
-            Dict[str, bool]: A dictionary mapping each output path to a boolean indicating whether the extraction was successful.
+            Dict[str, bool]: A mapping of output paths (str) to extraction
+                status (bool). True indicates the requested stream was found
+                and copied.
         """
+
         with tempfile.TemporaryDirectory() as tmp:
 
+            # Demux the entire SDT into a temporary directory
             demux_sdt(self.path, tmp)
 
             extracted: Dict[str, bool] = {}
@@ -65,6 +83,7 @@ class SDT:
                     out_str = os.fspath(out)
                     oext = os.path.splitext(out_str)[1].lower()
 
+                    # Allow extracting .m2v streams as .mp4 (simple rename)
                     if ext == oext or (ext == ".m2v" and oext == ".mp4"):
 
                         shutil.copy(src, out_str)
@@ -80,15 +99,16 @@ def create_sdt(
     pacb: Optional[PathType] = None
 ) -> None:
     """
-    Create an SDT file by muxing the given input files.
-    
+    Create an SDT file by muxing the given input streams.
+
     Args:
-        output (PathType): The path to the output SDT file.
-        m2v (Optional[PathType], optional): Path to the video file (.m2v). Defaults to None.
-        mtaf (Optional[PathType], optional): Path to the audio file (.mtaf). Defaults to None.
-        pacb (Optional[PathType], optional): Path to the subtitle file (.pacb). Defaults to None.
+        output (PathType): Path to the output SDT file.
+        m2v (Optional[PathType]): Path to the video stream (.m2v or .mp4).
+        mtaf (Optional[PathType]): Path to the audio stream (.mtaf).
+        pacb (Optional[PathType]): Path to the subtitle stream (.pacb).
     """
 
+    # Convert PathLike inputs to strings before passing to mux()
     mux(
         os.fspath(output),
         os.fspath(pacb) if pacb else None,

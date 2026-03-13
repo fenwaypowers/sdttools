@@ -4,7 +4,9 @@ from typing import Dict, BinaryIO
 from .utils import get_u32_le
 from .types import PathType
 
+
 STREAM_ID_ADPCM: int = 1
+
 
 extmap: Dict[int, str] = {
     0x00000001: ".genh",   # ADPCM -> GENH / ".sdx_0"
@@ -37,14 +39,17 @@ extmap: Dict[int, str] = {
 
 def demux_sdt(sdt_path: PathType, out_dir: PathType) -> None:
     """
-    Demux the contents of the specified SDT file into the given output directory.
+    Demultiplex (extract) streams from an SDT container.
+
     Args:
-        sdt_path (PathType): The path to the SDT file to demux.
-        out_dir (PathType): The directory to output the demuxed files to.
+        sdt_path (PathType): Path to the SDT file to demux.
+        out_dir (PathType): Directory where extracted streams will be written.
     """
+
     sdt_path = os.fspath(sdt_path)
     out_dir = os.fspath(out_dir)
 
+    # Map of stream IDs to open output file objects
     streams: Dict[int, BinaryIO] = {}
 
     with open(sdt_path, "rb") as sdt:
@@ -53,20 +58,24 @@ def demux_sdt(sdt_path: PathType, out_dir: PathType) -> None:
 
         while sdt.tell() < sdt_size:
 
+            # Each SDT record begins with a 16-byte header
             header: bytes = sdt.read(16)
             rid: int = get_u32_le(header, 0)
 
+            # 0xF0 marks the end of the SDT stream table
             if rid == 0xF0:
                 break
 
+            # 0x10 registers a new stream
             elif rid == 0x10:
 
                 sid: int = get_u32_le(header, 0x0C)
 
+                # Determine output filename based on known stream IDs
                 if sid in extmap:
                     path: str = os.path.join(
                         out_dir,
-                        os.path.splitext(os.path.basename(sdt_path))[0] + extmap[sid]
+                        os.path.splitext(os.path.basename(sdt_path))[0] + extmap[sid],
                     )
                 else:
                     path = os.path.join(
@@ -80,9 +89,11 @@ def demux_sdt(sdt_path: PathType, out_dir: PathType) -> None:
 
                 streams[sid] = open(path, "w+b")
 
+                # ADPCM streams require a GENH header placeholder
                 if sid == STREAM_ID_ADPCM:
                     streams[sid].write(b"\0" * 4096)
 
+            # Data record for an already registered stream
             elif rid in streams:
 
                 size: int = get_u32_le(header, 4) - 16
@@ -91,5 +102,6 @@ def demux_sdt(sdt_path: PathType, out_dir: PathType) -> None:
             else:
                 raise RuntimeError("unknown header ID")
 
+    # Close all opened output files
     for s in streams.values():
         s.close()

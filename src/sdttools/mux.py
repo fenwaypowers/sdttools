@@ -12,17 +12,20 @@ def write_record(
     unk: int = 0,
     param: int = 0
 ) -> None:
-    """Write a record to the given binary file.
+    """
+    Write an SDT record to a binary file.
 
     Args:
-        f (BinaryIO): The file to write to.
-        rid (int): The record ID.
-        payload (bytes, optional): The payload data. Defaults to b"".
-        unk (int, optional): Unknown parameter. Defaults to 0.
-        param (int, optional): Additional parameter. Defaults to 0.
+        f (BinaryIO): The file object to write to.
+        rid (int): Record ID.
+        payload (bytes): Record payload data.
+        unk (int): Unknown header field.
+        param (int): Additional parameter field used by some record types.
     """
 
+    # Each SDT record begins with a 16-byte header
     size = 16 + len(payload)
+
     f.write(struct.pack("<IIII", rid, size, unk, param))
     f.write(payload)
 
@@ -34,17 +37,18 @@ def mux(
     mtaf_path: Optional[PathType] = None
 ) -> None:
     """
-    Mux the given input files into an SDT file at the specified output path.
+    Create an SDT container by muxing the given input streams.
 
     Args:
-        outpath (str): The path to the output SDT file.
-        pacb_path (Optional[PathType], optional): Path to the subtitle file (.pacb). Defaults to None.
-        m2v_path (Optional[PathType], optional): Path to the video file (.m2v). Defaults to None.
-        mtaf_path (Optional[PathType], optional): Path to the audio file (.mtaf). Defaults to None.
+        outpath (str): Path where the output SDT file will be written.
+        pacb_path (Optional[PathType]): Path to subtitle stream (.pacb).
+        m2v_path (Optional[PathType]): Path to video stream (.m2v or .mp4).
+        mtaf_path (Optional[PathType]): Path to audio stream (.mtaf).
     """
 
     with open(outpath, "wb") as out:
 
+        # Register subtitle stream
         if pacb_path:
 
             write_record(out, 0x10, b"", 0, 0x00000004)
@@ -54,25 +58,32 @@ def mux(
 
             write_record(out, 0x00000004, pacb)
 
+        # Register video stream
         if m2v_path:
             write_record(out, 0x10, b"", 0, 0x00000020)
 
+        # Register audio stream
         if mtaf_path:
             write_record(out, 0x10, b"", 0, 0x00110001)
 
+        # Write MTAF audio stream
         if mtaf_path:
 
             with open(mtaf_path, "rb") as f:
                 mtaf: bytes = f.read()
 
+            # First 0x800 bytes contain the MTAF header
             header: bytes = mtaf[:0x800]
             write_record(out, 0x00110001, header)
 
+            # Remaining data contains ADPCM frames
             audio: bytes = mtaf[0x800:]
 
+            # SDT stores audio in 0x3FC0 byte chunks
             for c in chunks(audio, 0x3FC0):
                 write_record(out, 0x00110001, c, 0, 0x3C)
 
+        # Write video stream in 64 KB chunks
         if m2v_path:
 
             with open(m2v_path, "rb") as f:
@@ -80,4 +91,5 @@ def mux(
                 for chunk in iter(lambda: f.read(0x10000), b""):
                     write_record(out, 0x00000020, chunk)
 
+        # Write SDT end-of-stream marker
         write_record(out, 0xF0, b"", 0, 0)

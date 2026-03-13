@@ -8,7 +8,11 @@ from .sdt import SDT, create_sdt
 
 def main() -> None:
     """
-    Command-line interface for sdttools. Parses arguments and performs extraction or repacking based on the provided inputs.
+    Entry point for the sdttools command-line interface.
+
+    Parses command-line arguments and determines whether to extract
+    streams from an SDT file or create a new SDT container from
+    provided input streams.
     """
 
     parser = argparse.ArgumentParser(
@@ -22,13 +26,13 @@ def main() -> None:
             "  sdttools video.m2v -o movie.sdt   Create custom SDT\n\n"
             "Drag-and-drop is supported when using the executable version."
         ),
-        formatter_class=argparse.RawTextHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter,
     )
 
     parser.add_argument(
         "inputs",
         nargs="+",
-        help="Input files (.sdt, .m2v, .mp4, .mtaf, .pacb)"
+        help="Input files (.sdt, .m2v, .mp4, .mtaf, .pacb)",
     )
 
     parser.add_argument(
@@ -38,8 +42,8 @@ def main() -> None:
         help=(
             "Output file(s).\n"
             "Extraction: specify filenames or use 'all'.\n"
-            "Repacking: specify output .sdt file."
-        )
+            "Repacking: specify the output .sdt file."
+        ),
     )
 
     args: argparse.Namespace = parser.parse_args()
@@ -47,7 +51,7 @@ def main() -> None:
     inputs: List[str] = args.inputs
     outputs: List[str] = args.output or []
 
-    # Determine demux/mux mode based on input files
+    # Determine operation mode based on whether an SDT file was provided
     sdt_inputs: List[str] = [i for i in inputs if i.lower().endswith(".sdt")]
 
     if sdt_inputs:
@@ -55,7 +59,7 @@ def main() -> None:
     else:
         mode = "pack"
 
-    if mode == "extract": # Demuxing/extracting
+    if mode == "extract":  # Demuxing / extracting
 
         if len(sdt_inputs) > 1:
             sys.exit("Error: Only one SDT file can be extracted at a time.")
@@ -63,6 +67,7 @@ def main() -> None:
         sdt_path: str = sdt_inputs[0]
         sdt = SDT(sdt_path)
 
+        # Default behavior is to extract everything
         if not outputs:
             outputs = ["all"]
 
@@ -71,12 +76,13 @@ def main() -> None:
         else:
             sdt.extract(outputs)
 
-    else: # Muxing/packing
+    else:  # Muxing / packing
 
         video: Optional[str] = None
         audio: Optional[str] = None
         subs: Optional[str] = None
 
+        # Identify input streams based on file extensions
         for i in inputs:
 
             ext = os.path.splitext(i)[1].lower()
@@ -84,33 +90,45 @@ def main() -> None:
             if ext in [".m2v", ".mp4"]:
 
                 if video:
-                    print(f"Warning: Multiple video files detected. Using '{video}', ignoring '{i}'.")
+                    print(
+                        f"Warning: Multiple video files detected. "
+                        f"Using '{video}', ignoring '{i}'."
+                    )
                 else:
                     video = i
 
+                # MP4 compatibility warning
                 if ext == ".mp4":
                     print(
-                        "WARNING: MP4 files are likely only supported in the Master Collection version of Metal Gear Solid 2 and 3.\n"
+                        "WARNING: MP4 files are likely only supported in the "
+                        "Master Collection version of Metal Gear Solid 2 and 3.\n"
                         "Use MPEG-2 .m2v for PS3 HD versions."
                     )
 
             elif ext == ".mtaf":
 
                 if audio:
-                    print(f"Warning: Multiple audio files detected. Using '{audio}', ignoring '{i}'.")
+                    print(
+                        f"Warning: Multiple audio files detected. "
+                        f"Using '{audio}', ignoring '{i}'."
+                    )
                 else:
                     audio = i
 
             elif ext == ".pacb":
 
                 if subs:
-                    print(f"Warning: Multiple subtitle files detected. Using '{subs}', ignoring '{i}'.")
+                    print(
+                        f"Warning: Multiple subtitle files detected. "
+                        f"Using '{subs}', ignoring '{i}'."
+                    )
                 else:
                     subs = i
 
             else:
                 sys.exit(f"Unsupported input file: {i}")
 
+        # Default output filename if none was provided
         if not outputs:
             out_sdt: str = "output.sdt"
         else:

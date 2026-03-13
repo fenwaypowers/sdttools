@@ -4,24 +4,32 @@ from typing import Iterator
 
 def get_u32_le(buf: bytes, offset: int) -> int:
     """
-    Read a little-endian unsigned 32-bit integer from the given buffer at the specified offset.
+    Read a little-endian unsigned 32-bit integer from a byte buffer.
+
     Args:
         buf (bytes): The buffer to read from.
-        offset (int): The offset to read from.
+        offset (int): The byte offset within the buffer.
+
     Returns:
-        int: The little-endian unsigned 32-bit integer.
+        int: The decoded little-endian unsigned 32-bit integer.
     """
+
+    # struct.unpack returns a tuple, so extract the first value
     return struct.unpack("<I", buf[offset:offset + 4])[0]
 
 
 def chunks(data: bytes, size: int) -> Iterator[bytes]:
     """
-    Yield successive chunks of the given data with the specified size.
+    Yield successive fixed-size chunks from a byte sequence.
+
     Args:
-        data (bytes): The data to chunk.
-        size (int): The size of each chunk.
+        data (bytes): The input data to split into chunks.
+        size (int): Size of each chunk in bytes.
+
     Returns:
-        Iterator[bytes]: An iterator over the chunks.
+        Iterator[bytes]: Iterator yielding slices of the input data.
     """
+
+    # Iterate through the data in steps of the requested chunk size
     for i in range(0, len(data), size):
         yield data[i:i + size]
