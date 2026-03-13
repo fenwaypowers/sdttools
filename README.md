@@ -21,7 +21,7 @@ It can extract video, audio, and subtitle streams from SDT files and repack them
 - To extract, drag your `.sdt` file onto the `.exe`.
 - To repack, select the files you wish to pack into one `.sdt` file, and then drag them onto the `.exe`.
 
-### Linux
+### Linux:
 
 - Simply download the most recent binary from the [Releases tab](https://github.com/fenwaypowers/sdttools/releases).
 - See the [Command-Line Use section](https://github.com/fenwaypowers/sdttools?tab=readme-ov-file#command-line-use) to learn how to use the command line arguments.
