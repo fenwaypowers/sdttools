@@ -89,7 +89,7 @@ This project is based entirely from the [sdt_demux.py](https://github.com/kingji
 
 ## License
 
-[MIT](https://github.com/fenwaypowers/sdttools?tab=MIT-1-ov-file)
+[MIT](https://github.com/fenwaypowers/sdttools/blob/main/LICENSE)
 
 ## Future Features
 
