@@ -65,7 +65,7 @@ def main() -> None:
             sys.exit("Error: Only one SDT file can be extracted at a time.")
 
         sdt_path: str = sdt_inputs[0]
-        
+
         if os.path.exists(sdt_path):
             sdt = SDT(sdt_path)
         else:
@@ -131,6 +131,11 @@ def main() -> None:
 
             else:
                 sys.exit(f"Unsupported input file: {i}")
+
+        # Validate input files before attempting to mux
+        for f in (video, audio, subs):
+            if f and not os.path.exists(f):
+                sys.exit(f"Error: Input file not found: {f}")
 
         # Default output filename if none was provided
         if not outputs:
