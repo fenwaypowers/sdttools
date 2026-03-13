@@ -11,7 +11,7 @@ It can extract video, audio, and subtitle streams from SDT files and repack them
 - Extract any and all streams from `.sdt` files
 - Currently **only** supports repacking `.m2v`/`.mp4`, `.mtaf`, and `.pacb` into new SDT containers
 - Simple drag-and-drop support for `.exe` use
-- Works as both a CLI tool and Python library, allowing for automation through python scrpiting
+- Works as both a CLI tool and Python library, allowing for automation through python scripting
 
 ## How To Use
 
