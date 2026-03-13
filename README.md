@@ -24,7 +24,7 @@ It can extract video, audio, and subtitle streams from SDT files and repack them
 ### Linux
 
 - Simply download the most recent binary from the [Releases tab](https://github.com/fenwaypowers/sdttools/releases).
-- See the Command-Line Use section to learn how to use the command line arguments.
+- See the [Command-Line Use section](https://github.com/fenwaypowers/sdttools?tab=readme-ov-file#command-line-use) to learn how to use the command line arguments.
 
 You can also simply install the package with Python and use it on any computer that runs python.
 
