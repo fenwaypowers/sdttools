@@ -80,7 +80,7 @@ This can be used to automate extracting/repacking SDT files if you are dealing w
 
 ## Credit where credit is due
 
-This project is based entirely from the `std_demux.py` script.
+This project is based entirely from the [std_demux.py](https://github.com/kingjinxy/Metal-Gear-Solid-3-HD-Undub-PS3/blob/main/debug/sdt_demux.py) script.
 
 - Credit to [Nisto](https://hcs64.com/mboard/forum.php?userinfo=1220) for [creating the original script](https://hcs64.com/mboard/forum.php?showthread=46911).
 - Credit to [AnonRunzes](https://hcs64.com/mboard/forum.php?userinfo=1710) for [updating the script](https://hcs64.com/mboard/forum.php?showthread=46911&showpage=1).
