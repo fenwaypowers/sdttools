@@ -65,7 +65,11 @@ def main() -> None:
             sys.exit("Error: Only one SDT file can be extracted at a time.")
 
         sdt_path: str = sdt_inputs[0]
-        sdt = SDT(sdt_path)
+        
+        if os.path.exists(sdt_path):
+            sdt = SDT(sdt_path)
+        else:
+            sys.exit(f"Error: SDT file not found: {sdt_path}")
 
         # Default behavior is to extract everything
         if not outputs:
