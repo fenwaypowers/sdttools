@@ -91,9 +91,9 @@ This project is based entirely from the `std_demux.py` script.
 
 ## Future Features
 
-The plan for the future is to continue the functionality of this by allowing repacking more formats found in the `.sdt` container.
+The plan for the future is to continue the functionality of this project by allowing repacking more formats found in the `.sdt` container.
 
-Hopefully, people will add these extra functionalities by contributing to the project. m2v, mtaf, and pacb support is really all I was after, so I'm not sure I'll be working super hard on those other formats. 
+Hopefully, people will add these extra functionalities by contributing to the project. `m2v`, `mtaf`, and `pacb` support is really all I wanted, so I'm not sure I'll be working super hard on those other formats. But the structure of this project should hopefully let people easily add functionality for more file types.
 
 I encourage pull requests!
 
