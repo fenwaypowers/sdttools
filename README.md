@@ -55,6 +55,8 @@ options:
 
 ## Install as a package
 
+Make sure you have Python 3.8 or later installed.
+
 Clone the repository and install locally:
 
 ```bash
