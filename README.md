@@ -101,7 +101,7 @@ I encourage pull requests!
 
 When reporting bugs, please include:
 
-- the command you ran
+- the command/code you ran
 - the expected behavior
 - the actual behavior
 - the full error message
