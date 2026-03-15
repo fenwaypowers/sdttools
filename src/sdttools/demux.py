@@ -11,27 +11,27 @@ STREAM_ID_ADPCM: int = 1
 extmap: Dict[int, str] = {
     0x00000001: ".genh",   # ADPCM -> GENH / ".sdx_0"
     0x00000002: ".dmx",    # this container was found on Zone of the Enders HD Remaster
-	0x00000003: ".nrm",
+    0x00000003: ".nrm",
     0x00000004: ".pacb",   # has "PACB" magic not seen in any of the original versions the HD remaster was based on
     0x00000005: ".dmx",    # ditto
     0x00000006: ".bpx",    
     0x0000000c: ".pac",    # XBOX version of MGS2 - MPEG2 video format
     0x0000000d: ".pac",    # XBOX version of MGS2 - MPEG2 video format
-	0x0000000e: ".pss",    # PS2 version of MGS2 - MPEG2 video format
-	0x0000000f: ".ipu",    # PS2 version of MGS2 - MPEG2 video format
+    0x0000000e: ".pss",    # PS2 version of MGS2 - MPEG2 video format
+    0x0000000f: ".ipu",    # PS2 version of MGS2 - MPEG2 video format
     0x00000020: ".m2v",    # this container is present even on all versions of the HD remaster(PS3, XBOX360, PSVITA), regardless of format
     0x00010001: ".sdx_1",
-	0x00010004: ".sub_en", # it's a made-up container, becuase in the executable of those Metal Gear Solid PS2 games there's no indication of a container used for these formats
+    0x00010004: ".sub_en", # it's a made-up container, becuase in the executable of those Metal Gear Solid PS2 games there's no indication of a container used for these formats
     0x00020001: ".sdx_2",
-	0x00020004: ".sub_fr", # ditto
+    0x00020004: ".sub_fr", # ditto
     0x00030001: ".msf",    # PS3 HD remaster audio format
-	0x00030004: ".sub_de", # ditto
-	0x00040001: ".xwma",   # XBOX360 HD remaster audio format
-	0x00040004: ".sub_it", # ditto
-	0x00050001: ".9tav",   # PSVITA HD remaster audio format
-	0x00050004: ".sub_es", # ditto
-	0x00060004: ".sub_jp", # ditto
-	0x00070004: ".sub_jp", # ditto
+    0x00030004: ".sub_de", # ditto
+    0x00040001: ".xwma",   # XBOX360 HD remaster audio format
+    0x00040004: ".sub_it", # ditto
+    0x00050001: ".9tav",   # PSVITA HD remaster audio format
+    0x00050004: ".sub_es", # ditto
+    0x00060004: ".sub_jp", # ditto
+    0x00070004: ".sub_jp", # ditto
     0x00100001: ".vag",    # VAG1/VAG2 format
     0x00110001: ".mtaf",   # MTAF format
 }
@@ -97,7 +97,13 @@ def demux_sdt(sdt_path: PathType, out_dir: PathType) -> None:
             elif rid in streams:
 
                 size: int = get_u32_le(header, 4) - 16
-                streams[rid].write(sdt.read(size))
+                read_data: bytes = sdt.read(size)
+                # Field 0xC of the header is a sort of index, 0 is padding.
+                # It is also set to 0 for the first (non-padding) block.
+                # Only write the data if this is the first block,
+                # or field 0xC is nonzero. Otherwise, it's padding to drop.
+                if streams[rid].tell() == 0 or get_u32_le(header, 0xC) != 0:
+                    streams[rid].write(read_data)
 
             else:
                 raise RuntimeError("unknown header ID")
